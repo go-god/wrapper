@@ -6,7 +6,7 @@ import (
 	"github.com/go-god/wrapper/waitgroup"
 )
 
-type constructor func() wrapper.Wrapper
+type constructor func(opts ...wrapper.Options) wrapper.Wrapper
 
 const (
 	// WgWrapper waitGroup wrapper
@@ -17,15 +17,11 @@ const (
 
 var wrapperMap = map[string]constructor{
 	WgWrapper: waitgroup.New,
-	ChWrapper: nil,
+	ChWrapper: chanwrap.New,
 }
 
 // New create wrapper interface
-func New(name string, c ...int) wrapper.Wrapper {
-	if name == ChWrapper && len(c) > 0 && c[0] > 0 {
-		return chanwrap.New(c[0])
-	}
-
+func New(name string, opts ...wrapper.Options) wrapper.Wrapper {
 	if w, ok := wrapperMap[name]; ok {
 		return w()
 	}

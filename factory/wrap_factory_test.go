@@ -6,7 +6,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	wrap := New("wg", 1)
+	wrap := New("wg")
 	wrap.Wrap(func() {
 		log.Println(1111)
 	})

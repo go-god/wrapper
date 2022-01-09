@@ -14,9 +14,19 @@ type WrapImpl struct {
 }
 
 // New create wrapper entity
-func New() wrapper.Wrapper {
+func New(opts ...wrapper.Options) wrapper.Wrapper {
 	w := &WrapImpl{
 		recoveryFunc: grecover.DefaultRecovery,
+	}
+
+	var option = &wrapper.Option{}
+	for _, o := range opts {
+		o(option)
+	}
+
+	w.recoveryFunc = option.RecoveryFunc
+	if w.recoveryFunc == nil {
+		w.recoveryFunc = grecover.DefaultRecovery
 	}
 
 	return w
@@ -39,8 +49,4 @@ func (w *WrapImpl) WrapWithRecover(fn func()) {
 		defer w.Done()
 		fn()
 	}()
-}
-
-func (w *WrapImpl) WithRecover(recoveryFunc func()) {
-	w.recoveryFunc = recoveryFunc
 }

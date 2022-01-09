@@ -13,7 +13,6 @@ func mockRecovery() {
 
 func TestWrapper(t *testing.T) {
 	var wg = New()
-	wg.WithRecover(mockRecovery)
 	wg.Wrap(func() {
 		log.Println("1111")
 	})

@@ -9,18 +9,27 @@ var est = struct{}{}
 
 // WrapImpl wrapper impl
 type WrapImpl struct {
-	bufNum       int
+	bufCap       int
 	bufCh        chan struct{}
 	recoveryFunc func()
 }
 
 // New create wrapImpl entity
-func New(c int) wrapper.Wrapper {
-	w := &WrapImpl{
-		bufNum:       c,
-		bufCh:        make(chan struct{}, c),
-		recoveryFunc: grecover.DefaultRecovery,
+func New(opts ...wrapper.Options) wrapper.Wrapper {
+	w := &WrapImpl{}
+
+	var option = &wrapper.Option{}
+	for _, o := range opts {
+		o(option)
 	}
+
+	w.recoveryFunc = option.RecoveryFunc
+	if w.recoveryFunc == nil {
+		w.recoveryFunc = grecover.DefaultRecovery
+	}
+
+	w.bufCap = option.BufCap
+	w.bufCh = make(chan struct{}, w.bufCap)
 
 	return w
 }
@@ -44,14 +53,9 @@ func (c *WrapImpl) WrapWithRecover(fn func()) {
 
 // Wait wait all goroutine finish
 func (c *WrapImpl) Wait() {
-	for i := 0; i < c.bufNum; i++ {
+	for i := 0; i < c.bufCap; i++ {
 		<-c.bufCh
 	}
-}
-
-// WithRecover set recover func
-func (c *WrapImpl) WithRecover(recoveryFunc func()) {
-	c.recoveryFunc = recoveryFunc
 }
 
 func (c *WrapImpl) done() {
