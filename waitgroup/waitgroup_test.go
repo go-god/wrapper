@@ -3,6 +3,8 @@ package waitgroup
 import (
 	"log"
 	"testing"
+
+	"github.com/go-god/wrapper"
 )
 
 func mockRecovery() {
@@ -12,7 +14,7 @@ func mockRecovery() {
 }
 
 func TestWrapper(t *testing.T) {
-	var wg = New()
+	var wg = New(wrapper.WithRecover(mockRecovery))
 	wg.Wrap(func() {
 		log.Println("1111")
 	})

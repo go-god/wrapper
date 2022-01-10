@@ -6,7 +6,7 @@ import (
 	"github.com/go-god/wrapper/waitgroup"
 )
 
-type constructor func(opts ...wrapper.Options) wrapper.Wrapper
+type constructor func(opts ...wrapper.Option) wrapper.Wrapper
 
 const (
 	// WgWrapper waitGroup wrapper
@@ -21,15 +21,15 @@ var wrapperMap = map[string]constructor{
 }
 
 // New create wrapper interface
-func New(name string, opts ...wrapper.Options) wrapper.Wrapper {
+func New(name string, opts ...wrapper.Option) wrapper.Wrapper {
 	if w, ok := wrapperMap[name]; ok {
-		return w()
+		return w(opts...)
 	}
 
 	panic("wrapper type not exists")
 }
 
-// Register register gdi.Injector
+// Register register wrapper
 func Register(name string, c constructor) {
 	_, ok := wrapperMap[name]
 	if ok {

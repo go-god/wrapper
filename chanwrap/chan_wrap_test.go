@@ -7,8 +7,14 @@ import (
 	"github.com/go-god/wrapper"
 )
 
+func mockRecovery() {
+	if err := recover(); err != nil {
+		log.Printf("exec recover:%v\n", err)
+	}
+}
+
 func TestWrapper(t *testing.T) {
-	var wg = New(wrapper.WithBufCap(2))
+	var wg = New(wrapper.WithBufCap(2), wrapper.WithRecover(mockRecovery))
 	wg.Wrap(func() {
 		log.Println("1111")
 	})

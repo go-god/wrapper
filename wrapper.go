@@ -13,24 +13,24 @@ type Wrapper interface {
 }
 
 // Option wrapper option
-type Option struct {
+type Options struct {
 	BufCap       int
 	RecoveryFunc func()
 }
 
 // Options option func
-type Options func(o *Option)
+type Option func(o *Options)
 
 // WithBufCap set buf cap
-func WithBufCap(c int) Options {
-	return func(o *Option) {
+func WithBufCap(c int) Option {
+	return func(o *Options) {
 		o.BufCap = c
 	}
 }
 
 // WithRecover set recover func
-func WithRecover(recoveryFunc func()) Options {
-	return func(o *Option) {
+func WithRecover(recoveryFunc func()) Option {
+	return func(o *Options) {
 		o.RecoveryFunc = recoveryFunc
 	}
 }

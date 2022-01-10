@@ -15,10 +15,10 @@ type WrapImpl struct {
 }
 
 // New create wrapImpl entity
-func New(opts ...wrapper.Options) wrapper.Wrapper {
+func New(opts ...wrapper.Option) wrapper.Wrapper {
 	w := &WrapImpl{}
 
-	var option = &wrapper.Option{}
+	var option = &wrapper.Options{}
 	for _, o := range opts {
 		o(option)
 	}
