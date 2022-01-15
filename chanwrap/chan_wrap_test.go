@@ -14,16 +14,37 @@ func mockRecovery() {
 }
 
 func TestWrapper(t *testing.T) {
-	var wg = New(wrapper.WithBufCap(2), wrapper.WithRecover(mockRecovery))
-	wg.Wrap(func() {
+	num := 10 * 10000
+	c := num + 2
+	chWrap := New(wrapper.WithBufCap(c), wrapper.WithRecover(mockRecovery))
+	chWrap.Wrap(func() {
 		log.Println("1111")
 	})
 
-	wg.WrapWithRecover(func() {
+	for i := 0; i < num; i++ {
+		// The method of copying is used here to avoid the i
+		// in the wrap func being the same variable
+		index := i
+		chWrap.Wrap(func() {
+			log.Printf("current index: %d\n", index)
+		})
+	}
+
+	chWrap.WrapWithRecover(func() {
 		log.Println(2222)
 		panic("mock panic test")
 	})
-	wg.Wait()
-
-	// time.Sleep(10 * time.Second)
+	chWrap.Wait()
 }
+
+/**
+$ go test -v
+2022/01/15 18:06:42 current index: 99992
+2022/01/15 18:06:42 current index: 99996
+2022/01/15 18:06:42 current index: 99998
+2022/01/15 18:06:42 current index: 99997
+2022/01/15 18:06:42 current index: 99999
+2022/01/15 18:06:42 2222
+2022/01/15 18:06:45 exec recover:mock panic test
+--- PASS: TestWrapper (3.70s)
+*/

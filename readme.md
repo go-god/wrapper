@@ -18,6 +18,10 @@ import (
 )
 
 func main() {
+	// If the wrapper using the chan method needs to specify the number of
+	// goroutines to be executed,the wrapper.WithBufCap method needs to be called.
+	// Otherwise, after the Wait method is executed, some goroutines
+	// will exit without execution.
 	chWrap := factory.New(factory.ChWrapper, wrapper.WithBufCap(2))
 	chWrap.Wrap(func() {
 		log.Println("chan wrapper: 1111")

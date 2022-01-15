@@ -15,6 +15,10 @@ type WrapImpl struct {
 }
 
 // New create wrapImpl entity
+// If the wrapper using the chan method needs to specify the number of
+// goroutines to be executed,the wrapper.WithBufCap method needs to be called.
+// Otherwise, after the Wait method is executed, some goroutines
+// will exit without execution.
 func New(opts ...wrapper.Option) wrapper.Wrapper {
 	w := &WrapImpl{}
 
