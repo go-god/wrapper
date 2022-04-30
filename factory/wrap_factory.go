@@ -8,21 +8,24 @@ import (
 
 type constructor func(opts ...wrapper.Option) wrapper.Wrapper
 
+// WrapType wrap type
+type WrapType int
+
 const (
 	// WgWrapper waitGroup wrapper
-	WgWrapper = "wg"
+	WgWrapper WrapType = iota
 	// ChWrapper chan wrapper
-	ChWrapper = "ch"
+	ChWrapper
 )
 
-var wrapperMap = map[string]constructor{
+var wrapperMap = map[WrapType]constructor{
 	WgWrapper: waitgroup.New,
 	ChWrapper: chanwrap.New,
 }
 
 // New create wrapper interface
-func New(name string, opts ...wrapper.Option) wrapper.Wrapper {
-	if w, ok := wrapperMap[name]; ok {
+func New(wrapType WrapType, opts ...wrapper.Option) wrapper.Wrapper {
+	if w, ok := wrapperMap[wrapType]; ok {
 		return w(opts...)
 	}
 
@@ -30,11 +33,11 @@ func New(name string, opts ...wrapper.Option) wrapper.Wrapper {
 }
 
 // Register register wrapper
-func Register(name string, c constructor) {
-	_, ok := wrapperMap[name]
+func Register(wrapType WrapType, c constructor) {
+	_, ok := wrapperMap[wrapType]
 	if ok {
 		panic("registered injector already exists")
 	}
 
-	wrapperMap[name] = c
+	wrapperMap[wrapType] = c
 }

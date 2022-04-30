@@ -7,19 +7,18 @@ import (
 	"github.com/go-god/wrapper/grecover"
 )
 
-// WrapImpl sync.WaitGroup wrap impl
-type WrapImpl struct {
+var _ wrapper.Wrapper = (*wrapImpl)(nil)
+
+// wrapImpl sync.WaitGroup wrap impl
+type wrapImpl struct {
 	sync.WaitGroup
 	recoveryFunc func()
 }
 
 // New create wrapper entity
 func New(opts ...wrapper.Option) wrapper.Wrapper {
-	w := &WrapImpl{
-		recoveryFunc: grecover.DefaultRecovery,
-	}
-
-	var option = &wrapper.Options{}
+	w := &wrapImpl{}
+	option := &wrapper.Options{}
 	for _, o := range opts {
 		o(option)
 	}
@@ -33,7 +32,7 @@ func New(opts ...wrapper.Option) wrapper.Wrapper {
 }
 
 // Wrap fn func in goroutine to run
-func (w *WrapImpl) Wrap(fn func()) {
+func (w *wrapImpl) Wrap(fn func()) {
 	w.Add(1)
 	go func() {
 		defer w.Done()
@@ -42,7 +41,7 @@ func (w *WrapImpl) Wrap(fn func()) {
 }
 
 // WrapWithRecover exec func with recover
-func (w *WrapImpl) WrapWithRecover(fn func()) {
+func (w *wrapImpl) WrapWithRecover(fn func()) {
 	w.Add(1)
 	go func() {
 		defer w.recoveryFunc()

@@ -7,8 +7,10 @@ import (
 
 var est = struct{}{}
 
-// WrapImpl wrapper impl
-type WrapImpl struct {
+var _ wrapper.Wrapper = (*wrapImpl)(nil)
+
+// wrapImpl wrapper impl
+type wrapImpl struct {
 	bufCap       int
 	bufCh        chan struct{}
 	recoveryFunc func()
@@ -20,9 +22,8 @@ type WrapImpl struct {
 // Otherwise, after the Wait method is executed, some goroutines
 // will exit without execution.
 func New(opts ...wrapper.Option) wrapper.Wrapper {
-	w := &WrapImpl{}
-
-	var option = &wrapper.Options{}
+	w := &wrapImpl{}
+	option := &wrapper.Options{}
 	for _, o := range opts {
 		o(option)
 	}
@@ -39,7 +40,7 @@ func New(opts ...wrapper.Option) wrapper.Wrapper {
 }
 
 // Wrap exec func in goroutine without recover catch
-func (c *WrapImpl) Wrap(fn func()) {
+func (c *wrapImpl) Wrap(fn func()) {
 	go func() {
 		defer c.done()
 		fn()
@@ -47,7 +48,7 @@ func (c *WrapImpl) Wrap(fn func()) {
 }
 
 // WrapWithRecover safely execute func in goroutine
-func (c *WrapImpl) WrapWithRecover(fn func()) {
+func (c *wrapImpl) WrapWithRecover(fn func()) {
 	go func() {
 		defer c.recoveryFunc()
 		defer c.done()
@@ -56,12 +57,12 @@ func (c *WrapImpl) WrapWithRecover(fn func()) {
 }
 
 // Wait wait all goroutine finish
-func (c *WrapImpl) Wait() {
+func (c *wrapImpl) Wait() {
 	for i := 0; i < c.bufCap; i++ {
 		<-c.bufCh
 	}
 }
 
-func (c *WrapImpl) done() {
+func (c *wrapImpl) done() {
 	c.bufCh <- est
 }
