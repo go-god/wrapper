@@ -12,17 +12,12 @@ package main
 
 import (
 	"log"
-
+	
 	"github.com/go-god/wrapper"
-	"github.com/go-god/wrapper/factory"
 )
 
 func main() {
-	// If the wrapper using the chan method needs to specify the number of
-	// goroutines to be executed,the wrapper.WithBufCap method needs to be called.
-	// Otherwise, after the Wait method is executed, some goroutines
-	// will exit without execution.
-	chWrap := factory.New(factory.ChWrapper, wrapper.WithBufCap(2))
+	chWrap := wrapper.New(wrapper.ChWrapper, wrapper.WithBufCap(2))
 	chWrap.Wrap(func() {
 		log.Println("chan wrapper: 1111")
 	})
@@ -33,7 +28,7 @@ func main() {
 	chWrap.Wait()
 
 	// factory.WgWrapper No need to pass second parameter.
-	wg := factory.New(factory.WgWrapper)
+	wg := wrapper.New(wrapper.WgWrapper)
 	wg.Wrap(func() {
 		log.Println("wg wrapper:1111")
 	})

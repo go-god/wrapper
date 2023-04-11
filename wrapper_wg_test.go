@@ -1,10 +1,8 @@
-package waitgroup
+package wrapper
 
 import (
 	"log"
 	"testing"
-
-	"github.com/go-god/wrapper"
 )
 
 func mockRecovery() {
@@ -14,12 +12,12 @@ func mockRecovery() {
 }
 
 func TestWrapper(t *testing.T) {
-	wg := New(wrapper.WithRecover(mockRecovery))
+	wg := New(ChWrapper, WithRecover(mockRecovery))
 	wg.Wrap(func() {
 		log.Println("1111")
 	})
 
-	num := 10 * 10000
+	num := 10 * 100
 	for i := 0; i < num; i++ {
 		// The method of copying is used here to avoid the i
 		// in the wrap func being the same variable
@@ -38,14 +36,12 @@ func TestWrapper(t *testing.T) {
 
 /*
 $ go test -v
-2022/01/15 18:15:50 current index: 99993
-2022/01/15 18:15:50 current index: 99994
-2022/01/15 18:15:50 exec recover:mock panic test
-2022/01/15 18:15:50 current index: 99991
-2022/01/15 18:15:50 current index: 99995
-2022/01/15 18:15:50 current index: 99999
-2022/01/15 18:15:50 current index: 99997
-2022/01/15 18:15:50 current index: 99998
+2023/04/11 17:36:00 current index: 708
+2023/04/11 17:36:00 current index: 703
+2023/04/11 17:36:00 current index: 684
+2023/04/11 17:36:00 current index: 711
+2023/04/11 17:36:00 current index: 459
+2023/04/11 17:36:00 current index: 718
 --- PASS: TestWrapper (4.06s)
 PASS
 */

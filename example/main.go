@@ -4,11 +4,10 @@ import (
 	"log"
 
 	"github.com/go-god/wrapper"
-	"github.com/go-god/wrapper/factory"
 )
 
 func main() {
-	chWrap := factory.New(factory.ChWrapper, wrapper.WithBufCap(2))
+	chWrap := wrapper.New(wrapper.ChWrapper, wrapper.WithBufCap(2))
 	chWrap.Wrap(func() {
 		log.Println("chan wrapper: 1111")
 	})
@@ -19,7 +18,7 @@ func main() {
 	chWrap.Wait()
 
 	// factory.WgWrapper No need to pass second parameter.
-	wg := factory.New(factory.WgWrapper)
+	wg := wrapper.New(wrapper.WgWrapper)
 	wg.Wrap(func() {
 		log.Println("wg wrapper:1111")
 	})

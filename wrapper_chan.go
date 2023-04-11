@@ -1,36 +1,33 @@
-package chanwrap
+package wrapper
 
-import (
-	"github.com/go-god/wrapper"
-	"github.com/go-god/wrapper/grecover"
-)
+var _ Wrapper = (*wrapChanImpl)(nil)
 
-var est = struct{}{}
-
-var _ wrapper.Wrapper = (*wrapImpl)(nil)
-
-// wrapImpl wrapper impl
-type wrapImpl struct {
+// wrapChanImpl wrapper impl
+type wrapChanImpl struct {
 	bufCap       int
 	bufCh        chan struct{}
 	recoveryFunc func()
 }
 
-// New create wrapImpl entity
+// NewChanWrapper create wrapChanImpl entity
 // If the wrapper using the chan method needs to specify the number of
-// goroutines to be executed,the wrapper.WithBufCap method needs to be called.
+// goroutines to be executed,the WithBufCap method needs to be called.
 // Otherwise, after the Wait method is executed, some goroutines
 // will exit without execution.
-func New(opts ...wrapper.Option) wrapper.Wrapper {
-	w := &wrapImpl{}
-	option := &wrapper.Options{}
+func NewChanWrapper(opts ...Option) Wrapper {
+	w := &wrapChanImpl{}
+	option := &Options{}
 	for _, o := range opts {
 		o(option)
 	}
 
+	if option.BufCap == 0 {
+		panic("chan wrapper buf cap must be gt 0")
+	}
+
 	w.recoveryFunc = option.RecoveryFunc
 	if w.recoveryFunc == nil {
-		w.recoveryFunc = grecover.DefaultRecovery
+		w.recoveryFunc = defaultRecovery
 	}
 
 	w.bufCap = option.BufCap
@@ -40,7 +37,7 @@ func New(opts ...wrapper.Option) wrapper.Wrapper {
 }
 
 // Wrap exec func in goroutine without recover catch
-func (c *wrapImpl) Wrap(fn func()) {
+func (c *wrapChanImpl) Wrap(fn func()) {
 	go func() {
 		defer c.done()
 		fn()
@@ -48,7 +45,7 @@ func (c *wrapImpl) Wrap(fn func()) {
 }
 
 // WrapWithRecover safely execute func in goroutine
-func (c *wrapImpl) WrapWithRecover(fn func()) {
+func (c *wrapChanImpl) WrapWithRecover(fn func()) {
 	go func() {
 		defer c.recoveryFunc()
 		defer c.done()
@@ -57,12 +54,12 @@ func (c *wrapImpl) WrapWithRecover(fn func()) {
 }
 
 // Wait wait all goroutine finish
-func (c *wrapImpl) Wait() {
+func (c *wrapChanImpl) Wait() {
 	for i := 0; i < c.bufCap; i++ {
 		<-c.bufCh
 	}
 }
 
-func (c *wrapImpl) done() {
-	c.bufCh <- est
+func (c *wrapChanImpl) done() {
+	c.bufCh <- struct{}{}
 }
